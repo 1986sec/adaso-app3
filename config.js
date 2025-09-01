@@ -28,7 +28,7 @@ const config = {
     
     // CORS Configuration
     cors: {
-        origin: 'https://adaso.net'
+        origin: ['https://adaso.net', 'https://adaso-app3.netlify.app', 'http://localhost:3000']
     }
 };
 
