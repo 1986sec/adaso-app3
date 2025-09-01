@@ -23,7 +23,7 @@ async function apiRequest(endpoint, options = {}) {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('activeUser');
                 if (!/index\.html$/.test(window.location.pathname)) {
-                    window.location.href = 'index.html';
+                    window.location.href = '/index.html';
                 }
                 return;
             }
@@ -39,7 +39,7 @@ async function apiRequest(endpoint, options = {}) {
 document.addEventListener('DOMContentLoaded', async function() {
     const activeUser = localStorage.getItem('activeUser');
     if (!activeUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
     const userNameEl = document.getElementById('userName');
@@ -181,7 +181,7 @@ async function changePassword() {
         alert('Şifreniz başarıyla değiştirildi! Güvenliğiniz için bu bilgiyi kimseyle paylaşmayın.');
         
         setTimeout(() => {
-            window.location.href = 'anasayfa.html';
+            window.location.href = '/anasayfa.html';
         }, 1500);
     } catch (error) {
         alert('Şifre değiştirilirken hata oluştu: ' + error.message);
@@ -224,7 +224,7 @@ function logout() {
     if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
         localStorage.removeItem('activeUser');
         localStorage.removeItem('authToken');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
     return false;
 }

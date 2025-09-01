@@ -97,7 +97,7 @@ const login = async () => {
         }
         
         setTimeout(() => {
-            window.location.href = 'anasayfa.html';
+            window.location.href = '/anasayfa.html';
         }, 500);
         return;
     }
@@ -127,7 +127,7 @@ const login = async () => {
             }
 
             setTimeout(() => {
-                window.location.href = 'anasayfa.html';
+                window.location.href = '/anasayfa.html';
             }, 500);
         } else {
             message.textContent = "❌ Kullanıcı adı veya şifre hatalı!";

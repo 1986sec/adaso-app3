@@ -35,7 +35,7 @@ function logout() {
     localStorage.removeItem('isLoggedIn');
     
     // Redirect to login page
-    window.location.href = 'index.html';
+    window.location.href = '/index.html';
     return false;
 }
 

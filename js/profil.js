@@ -23,7 +23,7 @@ async function apiRequest(endpoint, options = {}) {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('activeUser');
                 if (!/index\.html$/.test(window.location.pathname)) {
-                    window.location.href = 'index.html';
+                    window.location.href = '/index.html';
                 }
                 return;
             }
@@ -54,7 +54,7 @@ function logout() {
     if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
         localStorage.removeItem('activeUser');
         localStorage.removeItem('authToken');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return false;
     }
     return false;
@@ -116,7 +116,7 @@ if (profileForm) {
         document.getElementById('profileForm').reset();
         
         setTimeout(() => {
-            window.location.href = 'anasayfa.html';
+            window.location.href = '/anasayfa.html';
         }, 1000);
     } catch (error) {
         alert('Profil güncellenirken hata oluştu: ' + error.message);
@@ -127,7 +127,7 @@ if (profileForm) {
 document.addEventListener('DOMContentLoaded', async function() {
     const activeUser = localStorage.getItem('activeUser');
     if (!activeUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
     

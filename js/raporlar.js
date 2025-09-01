@@ -23,7 +23,7 @@ async function apiRequest(endpoint, options = {}) {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('activeUser');
                 if (!/index\.html$/.test(window.location.pathname)) {
-                    window.location.href = 'index.html';
+                    window.location.href = '/index.html';
                 }
                 return;
             }
@@ -54,7 +54,7 @@ function logout() {
     if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
         localStorage.removeItem('activeUser');
         localStorage.removeItem('authToken');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
     return false;
 }
@@ -190,11 +190,11 @@ async function downloadFile(fileName) {
 
 function editReport(id) {
     localStorage.setItem('editZiyaretId', id);
-    window.location.href = 'ziyaretler.html';
+    window.location.href = '/ziyaretler.html';
 }
 
 function deleteReport(id) {
-    window.location.href = 'ziyaretler.html';
+    window.location.href = '/ziyaretler.html';
 }
 
 async function loadZiyaretRaporlari() {
@@ -493,7 +493,7 @@ async function drawPieChart() {
 document.addEventListener('DOMContentLoaded', async function() {
     const activeUser = localStorage.getItem('activeUser');
     if (!activeUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
     const userNameEl = document.getElementById('userName');

@@ -4,7 +4,7 @@ async function apiRequest(endpoint, options = {}) {
     const activeUser = localStorage.getItem('activeUser');
     
     if (!token && !activeUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
     
@@ -23,7 +23,7 @@ async function apiRequest(endpoint, options = {}) {
             if (response.status === 401) {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('activeUser');
-                window.location.href = 'index.html';
+                window.location.href = '/index.html';
                 return;
             }
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -53,7 +53,7 @@ function logout() {
     if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
         localStorage.removeItem('activeUser');
         localStorage.removeItem('authToken');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
     return false;
 }
@@ -151,7 +151,7 @@ async function loadRecentMeetings() {
 document.addEventListener('DOMContentLoaded', async function() {
     const activeUser = localStorage.getItem('activeUser');
     if (!activeUser) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
     const userNameEl = document.getElementById('userName');
