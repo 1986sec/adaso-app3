@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADASO - Gelir-Gider</title>
+    <link rel="stylesheet" href="../css/anasayfa.css">
+    <style>
+        .status.visited { background: #d4edda; color: #155724; }
+        .status.not-visited { background: #f8d7da; color: #721c24; }
+        .detail-row {
+            background: #f8f9fa;
+            border-left: 3px solid #B22222;
+        }
+        .detail-row td {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>ADASO</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="anasayfa.html">📊 Ana Sayfa</a></li>
+            <li><a href="firmalar.html">🏢 Firmalar</a></li>
+            <li><a href="ziyaretler.html">🚗 Ziyaretler</a></li>
+            <li><a href="gelir-gider.html">💰 Gelir-Gider</a></li>
+            <li><a href="raporlar.html">📈 Raporlar</a></li>
+        </ul>
+    </div>
+    
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-section" onclick="window.location.href='anasayfa.html'" style="cursor: pointer;">
+                <h1 class="company-name">ADASO</h1>
+                <span class="company-subtitle">Yönetim Sistemi</span>
+            </div>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Arama yapın...">
+            <button class="search-btn">🔍</button>
+        </div>
+        <div class="user-section">
+            <div class="notification-icon" onclick="toggleNotifications()">
+                🔔
+                <span class="notification-badge">0</span>
+                <div id="notificationDropdown" class="notification-dropdown">
+                    <div class="notification-header">Bildirimler</div>
+                    <div class="notification-list">
+                        <div class="notification-empty">Henüz bildirim yok</div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar"></div>
+                <span id="userName"></span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div id="userDropdown" class="user-dropdown">
+                <a href="ayarlar.html">⚙️ Ayarlar</a>
+                <hr>
+                <a href="index.html" onclick="return logout()">🚪 Çıkış</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="content">
+        <div class="page-header">
+            <h2>💰 Gelir-Gider Yönetimi</h2>
+            <p style="color: #666; font-size: 0.9rem;">Veriler ziyaretler kısmından otomatik olarak alınmaktadır</p>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3 id="totalIncome">0 ₺</h3>
+                    <p>Toplam Gelir</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📉</div>
+                <div class="stat-info">
+                    <h3 id="totalExpense">0 ₺</h3>
+                    <p>Toplam Gider</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                    <h3 id="netProfit">0 ₺</h3>
+                    <p>Net Kar</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sections-container">
+            <div class="section full-width">
+                <h3>📋 Gelir-Gider Kayıtları</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Açıklama</th>
+                            <th>Kategori</th>
+                            <th>Tutar</th>
+                            <th>Tip</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #666;">Henüz gelir-gider kaydı bulunmuyor</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <script src="../js/notifications.js"></script>
+    <script src="../js/gelir-gider.js"></script>
+</body>
+</html>

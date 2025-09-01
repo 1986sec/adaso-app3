@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Giriş/Kayıt Sistemi</title>
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="logo-section">
+            <div class="logo-container">
+                <img src="../adanas.png" class="logo-img" alt="ADASO Logo">
+                <h1 class="logo-title">ADASO</h1>
+                <br>
+                <h1 class="logo-title">Firma Takip Sistemine Giriş</h1>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="container">
+        <div class="tabs">
+            <button id="loginTab" class="active" onclick="showForm('login')">Giriş</button>
+            <button id="registerTab" onclick="showForm('register')">Kayıt Ol</button>
+        </div>
+        <div id="loginForm" class="form active">
+            <input type="text" id="loginUsername" class="tall-input" placeholder="Kullanıcı adı veya E-posta"  required />
+            <input type="password" id="loginPassword" class="tall-input" placeholder="Şifre" required />
+
+            <label class="checkbox-label"><input type="checkbox" id="rememberCheckbox"> Beni Hatırla</label>
+            <button class="submit" onclick="login()">Giriş Yap</button>
+            <div class="message" id="loginMessage"></div>
+            <a href="#" class="forgot-password" onclick="openForgotPasswordModal()">Şifremi Unuttum?</a>
+            
+
+        </div>
+
+        <div id="registerForm" class="form">
+            <input type="text" id="registerFullName" class="tall-input" placeholder="Ad Soyad" required />
+            <input type="email" id="registerEmail" class="tall-input" placeholder="E-posta" required />
+            <input type="text" id="registerUsername" class="tall-input" placeholder="Kullanıcı Adı" required />
+            <input type="password" id="registerPassword" class="tall-input" placeholder="Şifre Oluştur" required oninput="checkPasswordStrength()" />
+            <input type="password" id="registerPassword2" class="tall-input" placeholder="Şifreyi Doğrula" required oninput="checkPasswordMatch()" />
+            <div id="passwordRequirements" class="password-requirements">
+                <div id="req-length" class="requirement">• En az 6 karakter</div>
+                <div id="req-upper" class="requirement">• En az 1 büyük harf</div>
+                <div id="req-lower" class="requirement">• En az 1 küçük harf</div>
+                <div id="req-number" class="requirement">• En az 1 rakam</div>
+                <div id="req-match" class="requirement">• Şifreler eşleşmeli</div>
+            </div>
+            <button class="submit" onclick="register()">Kayıt Ol</button>
+            <div class="message" id="registerMessage"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔐 Şifre Sıfırlama</h3>
+                <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Kullanıcı adınızı veya e-posta adresinizi girin</p>
+                <input type="text" id="forgotPasswordUsername" class="modal-input" placeholder="Kullanıcı adı veya E-posta" required />
+                <div id="newPasswordArea" class="password-fields" style="display: none;">
+                    <input type="password" id="newPassword" class="modal-input" placeholder="Yeni Şifre" required oninput="checkModalPasswordStrength()" />
+                    <input type="password" id="newPassword2" class="modal-input" placeholder="Yeni Şifre (Tekrar)" required oninput="checkModalPasswordMatch()" />
+                    <div id="modalPasswordRequirements" class="password-requirements" style="margin-left: 0px;">
+                        <div id="modal-req-length" class="requirement">• En az 6 karakter</div>
+                        <div id="modal-req-upper" class="requirement">• En az 1 büyük harf</div>
+                        <div id="modal-req-lower" class="requirement">• En az 1 küçük harf</div>
+                        <div id="modal-req-number" class="requirement">• En az 1 rakam</div>
+                        <div id="modal-req-match" class="requirement">• Şifreler eşleşmeli</div>
+                    </div>
+                    <button class="submit modal-btn" onclick="updatePassword()">Şifreyi Güncelle</button>
+                </div>
+                <button id="resetPasswordBtn" class="submit modal-btn primary" onclick="resetPassword()">Devam Et</button>
+                <div class="message" id="forgotPasswordMessage"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/index.js"></script>
+</body>
+</html>
