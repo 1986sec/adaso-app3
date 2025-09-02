@@ -233,6 +233,38 @@ const login = async () => {
         return;
     }
 
+    // Production'da fallback authentication kullan
+    if (isProduction) {
+        const user = productionAuth.login(username, password);
+        
+        if (user) {
+            message.textContent = "✅ Giriş başarılı!";
+            
+            // Store user data
+            localStorage.setItem("activeUser", user.username);
+            localStorage.setItem("userData", JSON.stringify(user));
+
+            if (remember) {
+                localStorage.setItem("rememberUser", username);
+            } else {
+                localStorage.removeItem("rememberUser");
+            }
+
+            setTimeout(() => {
+                window.location.href = '/anasayfa.html';
+            }, 500);
+        } else {
+            message.textContent = "❌ Kullanıcı adı veya şifre hatalı!";
+        }
+        return;
+    }
+
+    // Local development'da normal API kullan (sadece API_BASE_URL varsa)
+    if (!API_BASE_URL) {
+        message.textContent = "❌ API bağlantısı mevcut değil!";
+        return;
+    }
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
