@@ -193,8 +193,29 @@
     </div>
 
     <script>
+        // Environment detection for API URL
+        const getApiBaseUrl = () => {
+            // Check if we're in production (adaso.net)
+            if (window.location.hostname === 'adaso.net' || window.location.hostname === 'adaso-app3.netlify.app') {
+                return 'https://adaso-backend.onrender.com/api';
+            }
+            // Check if we're in local development
+            else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return '/api';
+            }
+            // Default fallback
+            else {
+                return '/api';
+            }
+        };
+
         let currentToken = null;
         let currentResetToken = null;
+        let currentApiUrl = getApiBaseUrl();
+
+        // Log current API URL for debugging
+        console.log('🔗 Current API URL:', currentApiUrl);
+        console.log('🌐 Current hostname:', window.location.hostname);
 
         // Sayfa yüklendiğinde server durumunu kontrol et
         window.onload = function() {
