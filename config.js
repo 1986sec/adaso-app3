@@ -23,7 +23,7 @@ const config = {
     
     // JWT Configuration
     jwt: {
-        secret: 'adaso_super_secret_key_2024'
+        secret: '2d8c37661dfdd1e04a47ad6dd40a1f69'
     },
     
     // CORS Configuration

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADASO Türkçe API Test Sayfası</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status.online {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.offline {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .api-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .api-selector select {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 ADASO Türkçe Authentication API Test Sayfası</h1>
+    
+    <div class="api-selector">
+        <label for="apiUrl">API URL Seçin:</label>
+        <select id="apiUrl" onchange="changeApiUrl()">
+            <option value="/api">Local Server (Port 3000)</option>
+            <option value="https://adaso-backend.onrender.com/api">Production Backend</option>
+            <option value="https://adaso.net/api">Production Frontend</option>
+        </select>
+        <span id="currentApiUrl"></span>
+    </div>
+    
+    <div id="serverStatus" class="status">
+        Server durumu kontrol ediliyor...
+    </div>
+
+    <div class="container">
+        <h2>📋 Türkçe Field İsimleri ile Test</h2>
+        <p>Bu sayfa, ADASO authentication sistemini Türkçe field isimleriyle test etmenizi sağlar.</p>
+        
+        <div class="test-section">
+            <h3>1️⃣ Server Durumu</h3>
+            <button onclick="checkServerHealth()">Server Durumunu Kontrol Et</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2️⃣ Kullanıcı Kaydı (Türkçe)</h3>
+            <div class="form-group">
+                <label>Ad Soyad:</label>
+                <input type="text" id="regAdSoyad" placeholder="Test User" value="Test User">
+            </div>
+            <div class="form-group">
+                <label>E-posta:</label>
+                <input type="email" id="regEposta" placeholder="test@example.com" value="test@example.com">
+            </div>
+            <div class="form-group">
+                <label>Kullanıcı Adı:</label>
+                <input type="text" id="regKullaniciAdi" placeholder="testuser" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>Şifre:</label>
+                <input type="password" id="regSifre" placeholder="Test123" value="Test123">
+            </div>
+            <button onclick="testRegisterTurkce()">Kayıt Ol (Türkçe)</button>
+            <div id="registerResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3️⃣ Kullanıcı Girişi (Türkçe)</h3>
+            <div class="form-group">
+                <label>Kullanıcı Adı/E-posta:</label>
+                <input type="text" id="loginKullaniciAdi" placeholder="testuser" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>Şifre:</label>
+                <input type="password" id="loginSifre" placeholder="Test123" value="Test123">
+            </div>
+            <button onclick="testLoginTurkce()">Giriş Yap (Türkçe)</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4️⃣ Şifremi Unuttum (Türkçe)</h3>
+            <div class="form-group">
+                <label>Kullanıcı Adı/E-posta:</label>
+                <input type="text" id="forgotKullaniciAdi" placeholder="testuser" value="testuser">
+            </div>
+            <button onclick="testForgotPasswordTurkce()">Şifre Sıfırlama (Türkçe)</button>
+            <div id="forgotResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5️⃣ Şifre Güncelleme (Türkçe)</h3>
+            <div class="form-group">
+                <label>Reset Token:</label>
+                <input type="text" id="sifirlaToken" placeholder="Reset token buraya gelecek" readonly>
+            </div>
+            <div class="form-group">
+                <label>Yeni Şifre:</label>
+                <input type="password" id="yeniSifre" placeholder="NewTest123" value="NewTest123">
+            </div>
+            <button onclick="testResetPasswordTurkce()">Şifreyi Güncelle (Türkçe)</button>
+            <div id="resetResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>6️⃣ Yeni Şifre ile Giriş (Türkçe)</h3>
+            <div class="form-group">
+                <label>Kullanıcı Adı:</label>
+                <input type="text" id="newLoginKullaniciAdi" placeholder="testuser" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>Yeni Şifre:</label>
+                <input type="password" id="newLoginSifre" placeholder="NewTest123" value="NewTest123">
+            </div>
+            <button onclick="testNewPasswordLoginTurkce()">Yeni Şifre ile Giriş (Türkçe)</button>
+            <div id="newLoginResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>7️⃣ İngilizce Field İsimleri ile Test</h3>
+            <button onclick="testEnglishFields()">İngilizce Field'lar ile Test Et</button>
+            <div id="englishResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        let currentResetToken = null;
+        let currentApiUrl = '/api';
+
+        // Sayfa yüklendiğinde API URL'i güncelle
+        window.onload = function() {
+            changeApiUrl();
+            checkServerHealth();
+        };
+
+        function changeApiUrl() {
+            const select = document.getElementById('apiUrl');
+            currentApiUrl = select.value;
+            document.getElementById('currentApiUrl').textContent = `Mevcut API: ${currentApiUrl}`;
+            
+            // API URL değiştiğinde server durumunu kontrol et
+            checkServerHealth();
+        }
+
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(`${currentApiUrl}/health`);
+                const data = await response.json();
+                
+                document.getElementById('serverStatus').className = 'status online';
+                document.getElementById('serverStatus').textContent = `✅ Server Çalışıyor - ${currentApiUrl}`;
+                
+                document.getElementById('healthResult').className = 'result success';
+                document.getElementById('healthResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('serverStatus').className = 'status offline';
+                document.getElementById('serverStatus').textContent = `❌ Server Çalışmıyor - ${currentApiUrl}`;
+                
+                document.getElementById('healthResult').className = 'result error';
+                document.getElementById('healthResult').textContent = 'Server bağlantı hatası: ' + error.message;
+            }
+        }
+
+        async function testRegisterTurkce() {
+            const userData = {
+                adSoyad: document.getElementById('regAdSoyad').value,
+                eposta: document.getElementById('regEposta').value,
+                kullaniciAdi: document.getElementById('regKullaniciAdi').value,
+                sifre: document.getElementById('regSifre').value
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('registerResult').className = 'result success';
+                    document.getElementById('registerResult').textContent = '✅ Kayıt Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('registerResult').className = 'result error';
+                    document.getElementById('registerResult').textContent = '❌ Kayıt Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('registerResult').className = 'result error';
+                document.getElementById('registerResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+
+        async function testLoginTurkce() {
+            const loginData = {
+                kullaniciAdi: document.getElementById('loginKullaniciAdi').value,
+                sifre: document.getElementById('loginSifre').value
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentToken = result.token;
+                    document.getElementById('loginResult').className = 'result success';
+                    document.getElementById('loginResult').textContent = '✅ Giriş Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('loginResult').className = 'result error';
+                    document.getElementById('loginResult').textContent = '❌ Giriş Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('loginResult').className = 'result error';
+                document.getElementById('loginResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+
+        async function testForgotPasswordTurkce() {
+            const forgotData = {
+                kullaniciAdi: document.getElementById('forgotKullaniciAdi').value
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(forgotData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentResetToken = result.resetToken;
+                    document.getElementById('sifirlaToken').value = result.resetToken;
+                    document.getElementById('forgotResult').className = 'result success';
+                    document.getElementById('forgotResult').textContent = '✅ Şifre Sıfırlama Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('forgotResult').className = 'result error';
+                    document.getElementById('forgotResult').textContent = '❌ Şifre Sıfırlama Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('forgotResult').className = 'result error';
+                document.getElementById('forgotResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+
+        async function testResetPasswordTurkce() {
+            const resetData = {
+                sifirlaToken: document.getElementById('sifirlaToken').value,
+                yeniSifre: document.getElementById('yeniSifre').value
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(resetData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('resetResult').className = 'result success';
+                    document.getElementById('resetResult').textContent = '✅ Şifre Güncelleme Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('resetResult').className = 'result error';
+                    document.getElementById('resetResult').textContent = '❌ Şifre Güncelleme Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('resetResult').className = 'result error';
+                document.getElementById('resetResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+
+        async function testNewPasswordLoginTurkce() {
+            const loginData = {
+                kullaniciAdi: document.getElementById('newLoginKullaniciAdi').value,
+                sifre: document.getElementById('newLoginSifre').value
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentToken = result.token;
+                    document.getElementById('newLoginResult').className = 'result success';
+                    document.getElementById('newLoginResult').textContent = '✅ Yeni Şifre ile Giriş Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('newLoginResult').className = 'result error';
+                    document.getElementById('newLoginResult').textContent = '❌ Giriş Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('newLoginResult').className = 'result error';
+                document.getElementById('newLoginResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+
+        async function testEnglishFields() {
+            const userData = {
+                fullName: "English Test User",
+                email: "englishtest@example.com",
+                username: "englishtest",
+                password: "English123"
+            };
+
+            try {
+                const response = await fetch(`${currentApiUrl}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('englishResult').className = 'result success';
+                    document.getElementById('englishResult').textContent = '✅ İngilizce Field\'lar ile Kayıt Başarılı!\n' + JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('englishResult').className = 'result error';
+                    document.getElementById('englishResult').textContent = '❌ İngilizce Field\'lar ile Kayıt Hatası:\n' + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                document.getElementById('englishResult').className = 'result error';
+                document.getElementById('englishResult').textContent = '❌ Bağlantı Hatası:\n' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

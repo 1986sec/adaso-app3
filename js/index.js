@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://adaso-backend.onrender.com/api';
+const API_BASE_URL = '/api'; // Local server API
 
 function timingSafeEqual(a, b) {
     if (a.length !== b.length) return false;
@@ -60,7 +60,12 @@ const register = async () => {
         });
 
         if (response.ok) {
-            message.textContent = "✅ Kayıt başarılı";
+            const data = await response.json();
+            message.textContent = "✅ " + data.message;
+            
+            // Store token
+            localStorage.setItem("authToken", data.token);
+            localStorage.setItem("activeUser", data.user.username);
             
             setTimeout(() => {
                 document.getElementById('registerFullName').value = '';
@@ -88,17 +93,8 @@ const login = async () => {
     const message = document.getElementById("loginMessage");
     const remember = document.getElementById("rememberCheckbox").checked;
 
-    if (username === "admin" && password === "123") {
-        message.textContent = "✅ Giriş başarılı!";
-        localStorage.setItem("activeUser", "admin");
-        
-        if (remember) {
-            localStorage.setItem("rememberUser", username);
-        }
-        
-        setTimeout(() => {
-            window.location.href = '/anasayfa.html';
-        }, 500);
+    if (!username || !password) {
+        message.textContent = "⚠️ Kullanıcı adı ve şifre gereklidir!";
         return;
     }
 
@@ -116,9 +112,12 @@ const login = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            message.textContent = "✅ Giriş başarılı!";
+            message.textContent = "✅ " + data.message;
+            
+            // Store user data and token
             localStorage.setItem("activeUser", data.user.username);
             localStorage.setItem("authToken", data.token);
+            localStorage.setItem("userData", JSON.stringify(data.user));
 
             if (remember) {
                 localStorage.setItem("rememberUser", username);
@@ -130,7 +129,8 @@ const login = async () => {
                 window.location.href = '/anasayfa.html';
             }, 500);
         } else {
-            message.textContent = "❌ Kullanıcı adı veya şifre hatalı!";
+            const errorData = await response.json();
+            message.textContent = "❌ " + (errorData.message || "Giriş sırasında bir hata oluştu!");
         }
     } catch (error) {
         message.textContent = "❌ Bağlantı hatası! Lütfen tekrar deneyin.";
@@ -152,9 +152,9 @@ const closeForgotPasswordModal = () => {
     document.getElementById("resetPasswordBtn").style.display = "block";
 };
 
-let foundUser = null;
+let resetToken = null;
 
-const resetPassword = () => {
+const resetPassword = async () => {
     const input = document.getElementById("forgotPasswordUsername").value.trim();
     const message = document.getElementById("forgotPasswordMessage");
 
@@ -164,32 +164,35 @@ const resetPassword = () => {
         return;
     }
 
-    let found = false;
-    for(let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key === "activeUser" || key === "rememberUser") continue;
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username: input })
+        });
 
-        try {
-            const data = JSON.parse(localStorage.getItem(key));
-            if (key === input || data.email === input) {
-                foundUser = key;
-                message.textContent = "✅ Kullanıcı bulundu! Yeni şifrenizi belirleyin.";
-                message.style.color = "#28a745";
-                document.getElementById("newPasswordArea").style.display = "block";
-                document.getElementById("resetPasswordBtn").style.display = "none";
-                found = true;
-                break;
-            }
-        } catch (error) {}
-    }
-
-    if (!found) {
-        message.textContent = "❌ Kullanıcı bulunamadı!";
+        if (response.ok) {
+            const data = await response.json();
+            resetToken = data.resetToken;
+            message.textContent = "✅ Kullanıcı bulundu! Yeni şifrenizi belirleyin.";
+            message.style.color = "#28a745";
+            document.getElementById("newPasswordArea").style.display = "block";
+            document.getElementById("resetPasswordBtn").style.display = "none";
+        } else {
+            const errorData = await response.json();
+            message.textContent = "❌ " + (errorData.message || "Bir hata oluştu!");
+            message.style.color = "#dc3545";
+        }
+    } catch (error) {
+        message.textContent = "❌ Bağlantı hatası! Lütfen tekrar deneyin.";
         message.style.color = "#dc3545";
+        console.error('Reset password error:', error);
     }
 };
 
-const updatePassword = () => {
+const updatePassword = async () => {
     const newPassword = document.getElementById("newPassword").value;
     const newPassword2 = document.getElementById("newPassword2").value;
     const message = document.getElementById("forgotPasswordMessage");
@@ -212,18 +215,39 @@ const updatePassword = () => {
         return;
     }
 
+    if (!resetToken) {
+        message.textContent = "❌ Geçersiz reset token!";
+        message.style.color = "#dc3545";
+        return;
+    }
+
     try {
-        const data = JSON.parse(localStorage.getItem(foundUser));
-        data.password = newPassword;
-        localStorage.setItem(foundUser, JSON.stringify(data));
-        message.textContent = "✅ Şifreniz başarıyla güncellendi!";
-        message.style.color = "#28a745";
-        
-        setTimeout(() => {
-            closeForgotPasswordModal();
-        }, 2000);
+        const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                resetToken: resetToken,
+                newPassword: newPassword
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            message.textContent = "✅ " + data.message;
+            message.style.color = "#28a745";
+            
+            setTimeout(() => {
+                closeForgotPasswordModal();
+            }, 2000);
+        } else {
+            const errorData = await response.json();
+            message.textContent = "❌ " + (errorData.message || "Şifre güncellenirken bir hata oluştu!");
+            message.style.color = "#dc3545";
+        }
     } catch (error) {
-        message.textContent = "❌ Bir hata oluştu!";
+        message.textContent = "❌ Bağlantı hatası! Lütfen tekrar deneyin.";
         message.style.color = "#dc3545";
         console.error('Password update error:', error);
     }
