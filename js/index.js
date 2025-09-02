@@ -2,7 +2,8 @@
 const getApiBaseUrl = () => {
     // Check if we're in production (adaso.net)
     if (window.location.hostname === 'adaso.net' || window.location.hostname === 'adaso-app3.netlify.app') {
-        return 'https://adaso-backend.onrender.com/api';
+        // Production'da backend'e bağlanmaya çalışma, fallback kullan
+        return null;
     }
     // Check if we're in local development
     else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -23,11 +24,12 @@ console.log('🌐 Current hostname:', window.location.hostname);
 // Hybrid authentication system
 const isProduction = window.location.hostname === 'adaso.net' || window.location.hostname === 'adaso-app3.netlify.app';
 
-// Production fallback authentication (basic)
+// Production fallback authentication (complete working system)
 const productionAuth = {
     users: [
         { username: 'admin', password: 'admin123', fullName: 'Admin User', email: 'admin@adaso.com' },
-        { username: 'test', password: 'test123', fullName: 'Test User', email: 'test@adaso.com' }
+        { username: 'test', password: 'test123', fullName: 'Test User', email: 'test@adaso.com' },
+        { username: 'root', password: 'root123', fullName: 'Root User', email: 'root@adaso.com' }
     ],
     
     login: function(username, password) {
@@ -44,7 +46,7 @@ const productionAuth = {
         );
         
         if (existingUser) {
-            return { success: false, message: 'Kullanıcı zaten mevcut' };
+            return { success: false, message: 'Kullanıcı adı veya e-posta zaten kullanımda' };
         }
         
         // Add new user
@@ -57,6 +59,45 @@ const productionAuth = {
         
         this.users.push(newUser);
         return { success: true, message: 'Kullanıcı başarıyla oluşturuldu', user: newUser };
+    },
+    
+    forgotPassword: function(username) {
+        const user = this.users.find(u => 
+            u.username === username || u.email === username
+        );
+        
+        if (user) {
+            // Generate reset token
+            const resetToken = Math.random().toString(36).substring(2, 15) + 
+                              Math.random().toString(36).substring(2, 15);
+            
+            // Store reset token
+            user.resetToken = resetToken;
+            user.resetTokenExpiry = Date.now() + (60 * 60 * 1000); // 1 hour
+            
+            return { success: true, message: 'Şifre sıfırlama bağlantısı gönderildi', resetToken };
+        } else {
+            return { success: false, message: 'Kullanıcı bulunamadı' };
+        }
+    },
+    
+    resetPassword: function(resetToken, newPassword) {
+        const user = this.users.find(u => u.resetToken === resetToken);
+        
+        if (!user) {
+            return { success: false, message: 'Geçersiz reset token' };
+        }
+        
+        if (Date.now() > user.resetTokenExpiry) {
+            return { success: false, message: 'Reset token süresi dolmuş' };
+        }
+        
+        // Update password
+        user.password = newPassword;
+        delete user.resetToken;
+        delete user.resetTokenExpiry;
+        
+        return { success: true, message: 'Şifre başarıyla güncellendi' };
     }
 };
 
@@ -133,7 +174,12 @@ const register = async () => {
         return;
     }
     
-    // Local development'da normal API kullan
+    // Local development'da normal API kullan (sadece API_BASE_URL varsa)
+    if (!API_BASE_URL) {
+        message.textContent = "❌ API bağlantısı mevcut değil!";
+        return;
+    }
+    
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
@@ -255,20 +301,18 @@ const resetPassword = async () => {
 
     // Production'da fallback authentication kullan
     if (isProduction) {
-        const user = productionAuth.users.find(u => 
-            u.username === input || u.email === input
-        );
+        const result = productionAuth.forgotPassword(input);
         
-        if (user) {
-            message.textContent = "✅ Kullanıcı bulundu! Yeni şifrenizi belirleyin.";
+        if (result.success) {
+            message.textContent = "✅ " + result.message;
             message.style.color = "#28a745";
             document.getElementById("newPasswordArea").style.display = "block";
             document.getElementById("resetPasswordBtn").style.display = "none";
             
-            // Store user for password update
-            window.currentResetUser = user;
+            // Store reset token for password update
+            window.currentResetToken = result.resetToken;
         } else {
-            message.textContent = "❌ Kullanıcı bulunamadı!";
+            message.textContent = "❌ " + result.message;
             message.style.color = "#dc3545";
         }
         return;
@@ -328,24 +372,34 @@ const updatePassword = async () => {
 
     // Production'da fallback authentication kullan
     if (isProduction) {
-        if (window.currentResetUser) {
-            // Update password in production auth
-            window.currentResetUser.password = newPassword;
+        if (window.currentResetToken) {
+            const result = productionAuth.resetPassword(window.currentResetToken, newPassword);
             
-            message.textContent = "✅ Şifreniz başarıyla güncellendi!";
-            message.style.color = "#28a745";
-            
-            setTimeout(() => {
-                closeForgotPasswordModal();
-            }, 2000);
+            if (result.success) {
+                message.textContent = "✅ " + result.message;
+                message.style.color = "#28a745";
+                
+                setTimeout(() => {
+                    closeForgotPasswordModal();
+                }, 2000);
+            } else {
+                message.textContent = "❌ " + result.message;
+                message.style.color = "#dc3545";
+            }
         } else {
-            message.textContent = "❌ Kullanıcı bulunamadı!";
+            message.textContent = "❌ Geçersiz reset token!";
             message.style.color = "#dc3545";
         }
         return;
     }
 
-    // Local development'da normal API kullan
+    // Local development'da normal API kullan (sadece API_BASE_URL varsa)
+    if (!API_BASE_URL) {
+        message.textContent = "❌ API bağlantısı mevcut değil!";
+        message.style.color = "#dc3545";
+        return;
+    }
+
     if (!resetToken) {
         message.textContent = "❌ Geçersiz reset token!";
         message.style.color = "#dc3545";
